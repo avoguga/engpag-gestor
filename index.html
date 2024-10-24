@@ -80,7 +80,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s ease, transform 0.2s;
+      transition: background-color 0.3s ease, transform 0.3s ease;
       width: 100%;
       display: flex;
       align-items: center;
@@ -89,7 +89,7 @@
     }
 
     .login-box button:hover {
-      background-color: rgb(201, 48, 44);
+      background-color: rgba(201, 48, 44, 0.4); /* Ajustado para maior opacidade */
       transform: translateY(-3px);
     }
 
@@ -185,13 +185,15 @@
 
     .sidebar a i {
       margin-right: 12px; /* Espaço entre ícone e texto */
-      font-size: 1.2em;
+      font-size: 1.5em; /* Aumentado para melhor visibilidade */
       color: #d9534f; /* Ícones com tom de vermelho */
       transition: color 0.3s;
     }
 
     .sidebar.collapsed a i {
       margin-right: 0; /* Remover margem quando colapsado */
+      font-size: 1.8em; /* Aumentar ainda mais quando colapsado */
+      color: #ffffff; /* Cor branca para contraste */
     }
 
     .sidebar a span {
@@ -331,6 +333,52 @@
       color: #d9534f;
     }
 
+    /* Tooltip Personalizado */
+    .sidebar a.collapsed-tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      margin-left: 8px;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed a:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sidebar a.collapsed-tooltip::before {
+      content: '';
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: transparent #333 transparent transparent;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      margin-left: 6px;
+    }
+
+    .sidebar.collapsed a:hover::before {
+      opacity: 1;
+      visibility: visible;
+    }
+
     /* Conteúdo Principal */
     .main-content {
       margin-left: 250px;
@@ -413,7 +461,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s ease, transform 0.2s;
+      transition: background-color 0.3s ease, transform 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -422,8 +470,7 @@
     }
 
     button:hover {
-        background-color: rgba(201, 48, 44, 0.2);
-
+      background-color: rgba(201, 48, 44, 0.4); /* Ajustado para maior opacidade */
       transform: translateY(-3px);
     }
 
@@ -463,7 +510,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.3s ease, transform 0.2s;
+      transition: background-color 0.3s ease, transform 0.3s ease;
       cursor: pointer;
       font-weight: 500;
       margin-top: 20px;
@@ -677,15 +724,17 @@
   <div class="login-container" id="loginContainer" aria-hidden="true">
     <div class="login-box" role="dialog" aria-labelledby="loginTitle">
       <h2 id="loginTitle">Login</h2>
-      <input type="text" id="username" placeholder="Usuário" aria-label="Usuário" />
-      <input type="password" id="password" placeholder="Senha" aria-label="Senha" />
-      <button onclick="login()" aria-label="Entrar">Entrar</button>
+      <form id="loginForm" aria-label="Formulário de Login">
+        <input type="text" id="username" name="username" placeholder="Usuário" aria-label="Usuário" required />
+        <input type="password" id="password" name="password" placeholder="Senha" aria-label="Senha" required />
+        <button type="submit" aria-label="Entrar">Entrar</button>
+      </form>
       <div id="loginFeedback" role="alert" aria-live="polite"></div>
     </div>
   </div>
 
   <!-- Sidebar -->
-  <div class="sidebar" id="sidebar" aria-label="Sidebar de Navegação">
+  <div class="sidebar" id="sidebar" aria-label="Sidebar de Navegação" style="display: none;">
     <!-- Logo no Topo da Sidebar -->
     <div class="logo">
       <img src="./homelogo.png" alt="Eng Pag Logo" />
@@ -693,37 +742,37 @@
     <button class="toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
       <i class="fas fa-chevron-left" aria-hidden="true"></i>
     </button>
-    <a href="#" class="active" onclick="showSection('notifications')" role="button">
+    <a href="#" class="active" onclick="showSection('notifications')" role="button" aria-label="Notificações" title="Notificações">
       <i class="fas fa-bell" aria-hidden="true"></i>
       <span>Notificações</span>
     </a>
     <div class="submenu" aria-label="Submenu de Notificações">
-      <a href="#" onclick="showSubSection('sendUser')" role="button">
+      <a href="#" onclick="showSubSection('sendUser')" role="button" aria-label="Enviar para Usuário" title="Enviar para Usuário">
         <i class="fas fa-user-plus" aria-hidden="true"></i>
         <span>Enviar para Usuário</span>
       </a>
-      <a href="#" onclick="showSubSection('sendAll')" role="button">
+      <a href="#" onclick="showSubSection('sendAll')" role="button" aria-label="Enviar para Todos" title="Enviar para Todos">
         <i class="fas fa-users" aria-hidden="true"></i>
         <span>Enviar para Todos</span>
       </a>
-      <a href="#" onclick="showSubSection('viewByCpf')" role="button">
+      <a href="#" onclick="showSubSection('viewByCpf')" role="button" aria-label="Visualizar por CPF" title="Visualizar por CPF">
         <i class="fas fa-search" aria-hidden="true"></i>
         <span>Visualizar por CPF</span>
       </a>
     </div>
     <!-- Seção de Indicações -->
-    <a href="#" onclick="showSection('referrals')" role="button">
+    <a href="#" onclick="showSection('referrals')" role="button" aria-label="Indicações" title="Indicações">
       <i class="fas fa-user-friends" aria-hidden="true"></i>
       <span>Indicações</span>
     </a>
-    <a href="#" onclick="logout()" role="button">
+    <a href="#" onclick="logout()" role="button" aria-label="Sair" title="Sair">
       <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
       <span>Sair</span>
     </a>
   </div>
 
   <!-- Conteúdo Principal -->
-  <div class="main-content" id="mainContent" aria-label="Conteúdo Principal">
+  <div class="main-content" id="mainContent" aria-label="Conteúdo Principal" style="display: none;">
     <div class="container">
       <h1>Gerenciador - Eng Pag</h1>
 
@@ -800,31 +849,35 @@
     // URL do seu backend
     const backendUrl = "http://hw0oc4gc8ccwswwg4gk0kss8.167.88.39.225.sslip.io";
 
-    // Credenciais de login pré-definidas
-    const validUsername = "admin";
-    const validPassword = "admin";
-
     // Elementos de login
     const loginContainer = document.getElementById("loginContainer");
     const mainContent = document.getElementById("mainContent");
     const sidebar = document.getElementById("sidebar");
+    const loginForm = document.getElementById("loginForm");
+    const loginFeedback = document.getElementById("loginFeedback");
 
-    // Mostrar a tela de login se não estiver logado
-    if (!localStorage.getItem("isLoggedIn")) {
-      loginContainer.style.display = "flex";
-      mainContent.style.display = "none";
-      sidebar.style.display = "none"; // Esconder a sidebar
-    } else {
-      loginContainer.style.display = "none";
-      mainContent.style.display = "block";
-      sidebar.style.display = "flex"; // Mostrar a sidebar
-    }
+    // Verificar se o usuário está logado
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        loginContainer.style.display = "none";
+        mainContent.style.display = "block";
+        sidebar.style.display = "flex";
+        showSection("notifications");
+        showSubSection("sendUser");
+      } else {
+        loginContainer.style.display = "flex";
+        mainContent.style.display = "none";
+        sidebar.style.display = "none";
+      }
+    });
 
     // Função de login
-    function login() {
+    loginForm.addEventListener("submit", async function(event) {
+      event.preventDefault(); // Evitar o comportamento padrão do formulário
+
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
-      const loginFeedback = document.getElementById("loginFeedback");
 
       loginFeedback.innerHTML = "";
 
@@ -834,26 +887,59 @@
         return;
       }
 
-      if (username === validUsername && password === validPassword) {
-        localStorage.setItem("isLoggedIn", "true");
+      // Mostrar feedback de carregamento
+      loginFeedback.innerHTML =
+        '<div class="message success">Autenticando...</div>';
+
+      try {
+        const response = await fetch(`${backendUrl}/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ login: username, senha: password }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const token = data.token;
+
+          // Armazenar o token no localStorage
+          localStorage.setItem("token", token);
+
+          loginFeedback.innerHTML =
+            '<div class="message success">Login bem-sucedido! Redirecionando...</div>';
+
+          // Redirecionar após um breve intervalo
+          setTimeout(() => {
+            loginContainer.style.display = "none";
+            mainContent.style.display = "block";
+            sidebar.style.display = "flex";
+            showSection("notifications");
+            showSubSection("sendUser");
+          }, 1000);
+        } else {
+          const errorData = await response.json();
+          loginFeedback.innerHTML =
+            `<div class="message error">${errorData.mensagem || 'Erro no login.'}</div>`;
+        }
+      } catch (error) {
+        console.error("Erro ao realizar login:", error);
         loginFeedback.innerHTML =
-          '<div class="message success">Login bem-sucedido! Redirecionando...</div>';
-        // Mostrar a barra de carregamento
-        setTimeout(() => {
-          loginContainer.style.display = "none";
-          mainContent.style.display = "block";
-          sidebar.style.display = "flex";
-        }, 1000);
-      } else {
-        loginFeedback.innerHTML =
-          '<div class="message error">Usuário ou senha incorretos.</div>';
+          '<div class="message error">Erro ao realizar login. Tente novamente mais tarde.</div>';
       }
-    }
+    });
 
     // Função de logout
     function logout() {
-      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("token");
       window.location.reload();
+    }
+
+    // Middleware para incluir o token nas requisições
+    function getAuthHeaders() {
+      const token = localStorage.getItem("token");
+      return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
 
     // Função para alternar a sidebar
@@ -865,9 +951,23 @@
       if (sidebar.classList.contains("collapsed")) {
         toggleBtnIcon.classList.remove("fa-chevron-left");
         toggleBtnIcon.classList.add("fa-chevron-right");
+
+        // Adicionar classe para tooltips personalizados
+        const sidebarLinks = sidebar.querySelectorAll("a");
+        sidebarLinks.forEach(link => {
+          link.classList.add("collapsed-tooltip");
+          link.setAttribute("data-tooltip", link.querySelector("span").textContent.trim());
+        });
       } else {
         toggleBtnIcon.classList.remove("fa-chevron-right");
         toggleBtnIcon.classList.add("fa-chevron-left");
+
+        // Remover classe de tooltips personalizados
+        const sidebarLinks = sidebar.querySelectorAll("a");
+        sidebarLinks.forEach(link => {
+          link.classList.remove("collapsed-tooltip");
+          link.removeAttribute("data-tooltip");
+        });
       }
     }
 
@@ -970,14 +1070,6 @@
       parentLink.classList.remove("active");
     }
 
-    // Inicializar a exibição da seção Notificações e Enviar para Usuário
-    document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("isLoggedIn")) {
-        showSection("notifications");
-        showSubSection("sendUser");
-      }
-    });
-
     // Função para enviar mensagem para um usuário específico
     async function sendMessageToUser() {
       const cpf = document.getElementById("cpf").value.trim();
@@ -1001,6 +1093,7 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...getAuthHeaders(),
           },
           body: JSON.stringify({ cpf, subject, message }),
         });
@@ -1047,6 +1140,7 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...getAuthHeaders(),
           },
           body: JSON.stringify({ subject, message }),
         });
@@ -1087,7 +1181,11 @@
 
       try {
         // Atualização: Usando query parameter para CPF
-        const response = await fetch(`${backendUrl}/notifications?cpf=${encodeURIComponent(cpf)}`);
+        const response = await fetch(`${backendUrl}/notifications?cpf=${encodeURIComponent(cpf)}`, {
+          headers: {
+            ...getAuthHeaders(),
+          },
+        });
         if (response.ok) {
           const notifications = await response.json();
 
@@ -1152,7 +1250,7 @@
         <button class="action-btn save-btn" onclick="saveEditNotification('${id}')">
           <i class="fas fa-save" aria-hidden="true"></i>
         </button>
-        <button class="action-btn cancel-btn" onclick="cancelEditNotification('${id}', '${currentSubject}', '${currentMessage}')">
+        <button class="action-btn cancel-btn" onclick="cancelEditNotification('${id}', '${currentSubject.replace(/'/g, "\\'")}', '${currentMessage.replace(/'/g, "\\'")}')">
           <i class="fas fa-times" aria-hidden="true"></i>
         </button>
       `;
@@ -1173,6 +1271,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
+            ...getAuthHeaders(),
           },
           body: JSON.stringify({ subject: newSubject, message: newMessage }),
         });
@@ -1232,6 +1331,9 @@
       try {
         const response = await fetch(`${backendUrl}/notifications/${id}`, {
           method: 'DELETE',
+          headers: {
+            ...getAuthHeaders(),
+          },
         });
 
         if (response.ok) {
@@ -1260,7 +1362,11 @@
       spinner.style.display = "block"; // Mostrar spinner
 
       try {
-        const response = await fetch(`${backendUrl}/referrals`);
+        const response = await fetch(`${backendUrl}/referrals`, {
+          headers: {
+            ...getAuthHeaders(),
+          },
+        });
         if (response.ok) {
           const referrals = await response.json();
 
@@ -1317,6 +1423,9 @@
       try {
         const response = await fetch(`${backendUrl}/referrals/${id}`, {
           method: 'DELETE',
+          headers: {
+            ...getAuthHeaders(),
+          },
         });
 
         if (response.ok) {
@@ -1338,6 +1447,12 @@
 
     // Função para baixar relatório em PDF
     function downloadPDF() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Você precisa estar logado para baixar o relatório.");
+        return;
+      }
+
       const link = document.createElement("a");
       link.href = `${backendUrl}/referrals/report`;
       link.target = "_blank";
