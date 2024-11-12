@@ -872,9 +872,8 @@
       }
     });
 
-    // Função de login
     loginForm.addEventListener("submit", async function(event) {
-      event.preventDefault(); // Evitar o comportamento padrão do formulário
+      event.preventDefault();
 
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -896,18 +895,40 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
+            // Adicionar origin no header para ajudar com CORS
+            "Origin": window.location.origin
           },
-          body: JSON.stringify({ login: username, senha: password }),
+          // Adicionar credentials para permitir cookies e headers de autenticação
+          credentials: "include",
+          // Modo específico para CORS
+          mode: "cors",
+          body: JSON.stringify({ 
+            login: username, 
+            senha: password 
+          }),
         });
+
+        // Verificar se a resposta existe
+        if (!response) {
+          throw new Error('Não foi possível conectar ao servidor');
+        }
+
+        // Log para debug
+        console.log('Status da resposta:', response.status);
+        console.log('Headers da resposta:', Object.fromEntries(response.headers));
 
         if (response.ok) {
           const data = await response.json();
           const token = data.token;
 
+          if (!token) {
+            throw new Error('Token não recebido do servidor');
+          }
+
           // Armazenar o token no localStorage
           localStorage.setItem("token", token);
 
-          loginFeedback.innerHTML =
             '<div class="message success">Login bem-sucedido! Redirecionando...</div>';
 
           // Redirecionar após um breve intervalo
@@ -919,12 +940,20 @@
             showSubSection("sendUser");
           }, 1000);
         } else {
-          const errorData = await response.json();
+          // Tentar obter mensagem de erro do servidor
+          let errorMessage = 'Erro no login.';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.mensagem || errorMessage;
+          } catch (e) {
+            console.error('Erro ao processar resposta de erro:', e);
+          }
+
           loginFeedback.innerHTML =
-            `<div class="message error">${errorData.mensagem || 'Erro no login.'}</div>`;
+            `<div class="message error">${errorMessage}</div>`;
         }
       } catch (error) {
-        console.error("Erro ao realizar login:", error);
+        console.error("Erro detalhado ao realizar login:", error);
         loginFeedback.innerHTML =
           '<div class="message error">Erro ao realizar login. Tente novamente mais tarde.</div>';
       }
