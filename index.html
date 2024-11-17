@@ -8,6 +8,8 @@
       src="https://kit.fontawesome.com/2bd16d993e.js"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <!-- Google Fonts para uma fonte mais agradável -->
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
@@ -532,53 +534,6 @@
         transform: translateY(-3px);
       }
 
-      #referralsList,
-      #notificationsList {
-        margin-top: 20px;
-        overflow-x: auto;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-
-      th,
-      td {
-        border: 1px solid #ced4da;
-        padding: 14px 18px;
-        text-align: left;
-        font-size: 16px;
-      }
-
-      th {
-        background-color: #f2f2f2;
-        color: #2c3e50;
-      }
-
-      /* Botão de download destacado */
-      .download-btn {
-        background-color: #28a745;
-        color: white;
-        padding: 14px 24px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        cursor: pointer;
-        font-weight: 500;
-        margin-top: 20px;
-      }
-
-      .download-btn:hover {
-        background-color: #218838;
-        transform: translateY(-3px);
-      }
-
       /* Responsividade */
       @media (max-width: 992px) {
         .main-content {
@@ -786,10 +741,154 @@
           opacity: 1;
         }
       }
+
+      .excel-instructions {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .excel-instructions h3 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .excel-instructions ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      .excel-instructions li {
+        margin: 8px 0;
+        padding-left: 20px;
+        position: relative;
+      }
+
+      .excel-instructions li:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #d9534f;
+      }
+
+      .file-input-container {
+        margin-bottom: 20px;
+      }
+
+      .upload-form {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      #uploadResults {
+        margin-top: 20px;
+      }
+
+      #uploadResults table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      #uploadResults th,
+      #uploadResults td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      #uploadResults th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+      }
+
+      .status-success {
+        color: #155724;
+        background-color: #d4edda;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+
+      .status-error {
+        color: #721c24;
+        background-color: #f8d7da;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+
+      .preview-container {
+        margin-top: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .preview-controls {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .preview-table {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+      }
+
+      .preview-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .preview-table th,
+      .preview-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .preview-table th {
+        background-color: #f8f9fa;
+        position: sticky;
+        top: 0;
+      }
+
+      .secondary-button {
+        background-color: #6c757d;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .secondary-button:hover {
+        background-color: #5a6268;
+      }
+
+      .row-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .invalid-row {
+        background-color: #fff3f3;
+      }
+
+      .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 4px;
+      }
     </style>
   </head>
   <body>
-    <!-- Tela de Login -->
     <div class="login-container" id="loginContainer" aria-hidden="true">
       <div class="login-box" role="dialog" aria-labelledby="loginTitle">
         <h2 id="loginTitle">Login</h2>
@@ -868,6 +967,16 @@
         </a>
         <a
           href="#"
+          onclick="showSubSection('bulkUpload')"
+          role="button"
+          aria-label="Upload em Massa"
+          title="Upload em Massa"
+        >
+          <i class="fas fa-file-excel" aria-hidden="true"></i>
+          <span>Enviar para uma lista</span>
+        </a>
+        <a
+          href="#"
           onclick="showSubSection('viewByCpf')"
           role="button"
           aria-label="Visualizar por CPF"
@@ -877,17 +986,6 @@
           <span>Visualizar por CPF</span>
         </a>
       </div>
-      <!-- Seção de Indicações -->
-      <a
-        href="#"
-        onclick="showSection('referrals')"
-        role="button"
-        aria-label="Indicações"
-        title="Indicações"
-      >
-        <i class="fas fa-user-friends" aria-hidden="true"></i>
-        <span>Indicações</span>
-      </a>
       <a
         href="#"
         onclick="logout()"
@@ -1010,6 +1108,79 @@
             <div id="allUsersFeedback" role="alert" aria-live="polite"></div>
           </div>
 
+          <div id="bulkUploadSection" style="display: none">
+            <h2>Upload em Massa de Mensagens</h2>
+
+            <div class="excel-instructions">
+              <h3>Instruções:</h3>
+              <p>A planilha deve conter as seguintes colunas:</p>
+              <ul>
+                <li>cpf - CPF do usuário</li>
+                <li>assunto - Assunto da mensagem</li>
+                <li>mensagem - Conteúdo da mensagem</li>
+                <li>
+                  mostrarNoLogin - "sim" ou "não" (se a mensagem deve aparecer
+                  no login)
+                </li>
+              </ul>
+            </div>
+
+            <form id="bulkUploadForm" class="upload-form">
+              <div class="file-input-container">
+                <label for="excelFile">Selecione a planilha Excel:</label>
+                <input
+                  type="file"
+                  id="excelFile"
+                  accept=".xlsx,.xls"
+                  aria-label="Arquivo Excel"
+                />
+              </div>
+
+              <div
+                id="previewContainer"
+                style="display: none"
+                class="preview-container"
+              >
+                <h3>Preview dos Dados</h3>
+                <div class="preview-controls">
+                  <button
+                    type="button"
+                    id="selectAllBtn"
+                    class="secondary-button"
+                  >
+                    Selecionar Todos
+                  </button>
+                  <button
+                    type="button"
+                    id="deselectAllBtn"
+                    class="secondary-button"
+                  >
+                    Desselecionar Todos
+                  </button>
+                </div>
+                <div id="previewTable" class="preview-table"></div>
+              </div>
+
+              <button
+                type="submit"
+                id="sendButton"
+                style="display: none"
+                aria-label="Enviar Mensagens"
+              >
+                <i class="fas fa-paper-plane" aria-hidden="true"></i> Enviar
+                Mensagens
+                <div
+                  id="bulkUploadSpinner"
+                  class="spinner"
+                  style="display: none"
+                  aria-hidden="true"
+                ></div>
+              </button>
+            </form>
+
+            <div id="bulkUploadFeedback" role="alert" aria-live="polite"></div>
+            <div id="uploadResults"></div>
+          </div>
           <!-- Subseção: Visualizar Notificações por CPF -->
           <div id="viewByCpfSection" style="display: none">
             <h2>Visualizar Notificações por CPF</h2>
@@ -1037,29 +1208,6 @@
             <div id="notificationsList"></div>
           </div>
         </div>
-
-        <!-- Seção de Indicações -->
-        <div id="referralsSection" class="section" style="display: none">
-          <h2>Verificar Indicações</h2>
-          <button onclick="showReferrals()" aria-label="Ver Indicações">
-            <i class="fas fa-eye" aria-hidden="true"></i> Ver Indicações
-            <div
-              id="showReferralsSpinner"
-              class="spinner"
-              style="display: none"
-              aria-hidden="true"
-            ></div>
-          </button>
-          <div id="referralsList"></div>
-          <button
-            class="download-btn"
-            onclick="downloadPDF()"
-            aria-label="Baixar Relatório em PDF"
-          >
-            <i class="fas fa-file-pdf" aria-hidden="true"></i> Baixar Relatório
-            em PDF
-          </button>
-        </div>
       </div>
     </div>
 
@@ -1073,6 +1221,9 @@
       const sidebar = document.getElementById("sidebar");
       const loginForm = document.getElementById("loginForm");
       const loginFeedback = document.getElementById("loginFeedback");
+
+      // Variáveis globais para o processamento do Excel
+      let processedData = [];
 
       // Verificar se o usuário está logado
       document.addEventListener("DOMContentLoaded", () => {
@@ -1092,7 +1243,7 @@
 
       // Função de login
       loginForm.addEventListener("submit", async function (event) {
-        event.preventDefault(); // Evitar o comportamento padrão do formulário
+        event.preventDefault();
 
         const username = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value.trim();
@@ -1105,7 +1256,6 @@
           return;
         }
 
-        // Mostrar feedback de carregamento
         loginFeedback.innerHTML =
           '<div class="message success">Autenticando...</div>';
 
@@ -1133,15 +1283,10 @@
             }
           } else {
             const data = await response.json();
-            const token = data.token;
-
-            // Armazenar o token no localStorage
-            localStorage.setItem("token", token);
-
+            localStorage.setItem("token", data.token);
             loginFeedback.innerHTML =
               '<div class="message success">Login bem-sucedido! Redirecionando...</div>';
 
-            // Redirecionar após um breve intervalo
             setTimeout(() => {
               loginContainer.style.display = "none";
               mainContent.style.display = "block";
@@ -1162,29 +1307,24 @@
         }
       });
 
-      // Função de logout
       function logout() {
         localStorage.removeItem("token");
         window.location.reload();
       }
 
-      // Middleware para incluir o token nas requisições
       function getAuthHeaders() {
         const token = localStorage.getItem("token");
         return token ? { Authorization: `Bearer ${token}` } : {};
       }
 
-      // Função para alternar a sidebar
       function toggleSidebar() {
         const toggleBtnIcon = sidebar.querySelector(".toggle-btn i");
         sidebar.classList.toggle("collapsed");
 
-        // Alterar o ícone conforme o estado da sidebar
         if (sidebar.classList.contains("collapsed")) {
           toggleBtnIcon.classList.remove("fa-chevron-left");
           toggleBtnIcon.classList.add("fa-chevron-right");
 
-          // Adicionar classe para tooltips personalizados
           const sidebarLinks = sidebar.querySelectorAll("a");
           sidebarLinks.forEach((link) => {
             link.classList.add("collapsed-tooltip");
@@ -1197,7 +1337,6 @@
           toggleBtnIcon.classList.remove("fa-chevron-right");
           toggleBtnIcon.classList.add("fa-chevron-left");
 
-          // Remover classe de tooltips personalizados
           const sidebarLinks = sidebar.querySelectorAll("a");
           sidebarLinks.forEach((link) => {
             link.classList.remove("collapsed-tooltip");
@@ -1206,12 +1345,10 @@
         }
       }
 
-      // Função para alternar seções principais
       function showSection(section) {
         const notificationsSection = document.getElementById(
           "notificationsSection"
         );
-        const referralsSection = document.getElementById("referralsSection");
         const sidebarLinks = document.querySelectorAll(".sidebar a");
 
         sidebarLinks.forEach((link) => {
@@ -1220,74 +1357,68 @@
 
         if (section === "notifications") {
           notificationsSection.style.display = "block";
-          referralsSection.style.display = "none";
           sidebarLinks.forEach((link) => {
             if (link.textContent.trim() === "Notificações") {
               link.classList.add("active");
             }
           });
-          // Mostrar submenu
           toggleSubmenu("Notificações");
-        } else if (section === "referrals") {
-          notificationsSection.style.display = "none";
-          referralsSection.style.display = "block";
-          sidebarLinks.forEach((link) => {
-            if (link.textContent.trim() === "Indicações") {
-              link.classList.add("active");
-            }
-          });
-          // Ocultar submenu
-          hideSubmenu();
         }
       }
 
-      // Função para alternar subseções dentro de Notificações
       function showSubSection(subSection) {
         const sendUserSection = document.getElementById("sendUserSection");
         const sendAllSection = document.getElementById("sendAllSection");
         const viewByCpfSection = document.getElementById("viewByCpfSection");
+        const bulkUploadSection = document.getElementById("bulkUploadSection");
         const submenuLinks = document.querySelectorAll(".submenu a");
 
         submenuLinks.forEach((link) => {
           link.classList.remove("active-sub");
         });
 
+        sendUserSection.style.display = "none";
+        sendAllSection.style.display = "none";
+        viewByCpfSection.style.display = "none";
+        bulkUploadSection.style.display = "none";
+
         if (subSection === "sendUser") {
           sendUserSection.style.display = "block";
-          sendAllSection.style.display = "none";
-          viewByCpfSection.style.display = "none";
           submenuLinks.forEach((link) => {
             if (link.textContent.trim() === "Enviar para Usuário") {
               link.classList.add("active-sub");
             }
           });
         } else if (subSection === "sendAll") {
-          sendUserSection.style.display = "none";
           sendAllSection.style.display = "block";
-          viewByCpfSection.style.display = "none";
           submenuLinks.forEach((link) => {
             if (link.textContent.trim() === "Enviar para Todos") {
               link.classList.add("active-sub");
             }
           });
         } else if (subSection === "viewByCpf") {
-          sendUserSection.style.display = "none";
-          sendAllSection.style.display = "none";
           viewByCpfSection.style.display = "block";
           submenuLinks.forEach((link) => {
             if (link.textContent.trim() === "Visualizar por CPF") {
               link.classList.add("active-sub");
             }
           });
+        } else if (subSection === "bulkUpload") {
+          bulkUploadSection.style.display = "block";
+          submenuLinks.forEach((link) => {
+            if (link.textContent.trim() === "Upload em Massa") {
+              link.classList.add("active-sub");
+            }
+          });
         }
       }
 
-      // Função para alternar a visibilidade do submenu
       function toggleSubmenu(menuName) {
         const submenu = document.querySelector(".sidebar .submenu");
         const parentLink = Array.from(
           document.querySelectorAll(".sidebar a")
         ).find((link) => link.textContent.trim() === menuName);
+
         if (submenu.style.display === "flex") {
           submenu.style.display = "none";
           parentLink.classList.remove("active");
@@ -1297,7 +1428,6 @@
         }
       }
 
-      // Função para esconder submenu
       function hideSubmenu() {
         const submenu = document.querySelector(".sidebar .submenu");
         const parentLink = Array.from(
@@ -1307,7 +1437,144 @@
         parentLink.classList.remove("active");
       }
 
-      // Função para enviar mensagem para um usuário específico
+      // Funções para Excel
+      function validateCPF(cpf) {
+        cpf = cpf.toString().replace(/\D/g, "");
+        return cpf.length === 11;
+      }
+
+      function validateRow(row) {
+        const errors = [];
+
+        if (!row.cpf || !validateCPF(row.cpf)) {
+          errors.push("CPF inválido");
+        }
+        if (!row.subject?.trim()) {
+          errors.push("Assunto é obrigatório");
+        }
+        if (!row.message?.trim()) {
+          errors.push("Mensagem é obrigatória");
+        }
+
+        return errors;
+      }
+
+      function processExcelFile(file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+            processedData = jsonData.map((row) => {
+              // Mapear campos do português para inglês
+              const processed = {
+                cpf: String(row.cpf || "").replace(/\D/g, ""),
+                subject: row.assunto || "", // campo em português
+                message: row.mensagem || "", // campo em português
+                showOnHome: row.mostrarNoLogin?.toLowerCase() === "sim", // campo em português
+                selected: true,
+                errors: [],
+              };
+
+              // Validar dados
+              if (!processed.cpf || !validateCPF(processed.cpf)) {
+                processed.errors.push("CPF inválido");
+              }
+              if (!processed.subject) {
+                processed.errors.push("Assunto é obrigatório");
+              }
+              if (!processed.message) {
+                processed.errors.push("Mensagem é obrigatória");
+              }
+
+              return processed;
+            });
+
+            displayPreview(processedData);
+          } catch (error) {
+            console.error("Erro ao processar arquivo:", error);
+            document.getElementById("bulkUploadFeedback").innerHTML =
+              '<div class="message error">Erro ao processar o arquivo. Verifique se o formato está correto.</div>';
+          }
+        };
+
+        reader.readAsArrayBuffer(file);
+      }
+
+      // Atualize também a função displayPreview para mostrar os rótulos em português
+      function displayPreview(data) {
+        const previewContainer = document.getElementById("previewContainer");
+        const previewTable = document.getElementById("previewTable");
+        const sendButton = document.getElementById("sendButton");
+
+        let html = `
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAll" checked></th>
+          <th>CPF</th>
+          <th>Assunto</th>
+          <th>Mensagem</th>
+          <th>Mostrar no Login</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+        data.forEach((row, index) => {
+          const isInvalid = row.errors.length > 0;
+          html += `
+      <tr class="${isInvalid ? "invalid-row" : ""}">
+        <td>
+          <input type="checkbox" class="row-checkbox" data-index="${index}" 
+            ${row.selected ? "checked" : ""} ${isInvalid ? "disabled" : ""}>
+        </td>
+        <td>${row.cpf}</td>
+        <td>${row.subject}</td>
+        <td>${row.message}</td>
+        <td>${row.showOnHome ? "sim" : "não"}</td>
+        <td>
+          ${
+            isInvalid
+              ? `<div class="error-message">${row.errors.join(", ")}</div>`
+              : '<span class="status-success">Válido</span>'
+          }
+        </td>
+      </tr>
+    `;
+        });
+
+        html += "</tbody></table>";
+
+        previewTable.innerHTML = html;
+        previewContainer.style.display = "block";
+        sendButton.style.display = "block";
+
+        // Event Listeners
+        document
+          .getElementById("selectAll")
+          .addEventListener("change", function (e) {
+            const checkboxes = document.querySelectorAll(
+              ".row-checkbox:not([disabled])"
+            );
+            checkboxes.forEach((cb) => {
+              cb.checked = e.target.checked;
+              processedData[cb.dataset.index].selected = e.target.checked;
+            });
+          });
+
+        document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+          checkbox.addEventListener("change", function (e) {
+            processedData[e.target.dataset.index].selected = e.target.checked;
+          });
+        });
+      }
+
       async function sendMessageToUser() {
         const cpf = document.getElementById("cpf").value.trim();
         const subject = document.getElementById("userSubject").value.trim();
@@ -1324,7 +1591,7 @@
           return;
         }
 
-        spinner.style.display = "block"; // Mostrar spinner
+        spinner.style.display = "block";
 
         try {
           const response = await fetch(`${backendUrl}/send-message`, {
@@ -1344,7 +1611,6 @@
           if (response.ok) {
             const result = await response.text();
             feedback.innerHTML = `<div class="message success">${result}</div>`;
-            // Limpar campos após envio
             document.getElementById("cpf").value = "";
             document.getElementById("userSubject").value = "";
             document.getElementById("userMessage").value = "";
@@ -1358,11 +1624,10 @@
           feedback.innerHTML =
             '<div class="message error">Erro ao enviar mensagem.</div>';
         } finally {
-          spinner.style.display = "none"; // Esconder spinner
+          spinner.style.display = "none";
         }
       }
 
-      // Função para enviar mensagem para todos os usuários
       async function sendMessageToAll() {
         const subject = document.getElementById("allUsersSubject").value.trim();
         const message = document.getElementById("allUsersMessage").value.trim();
@@ -1380,7 +1645,7 @@
           return;
         }
 
-        spinner.style.display = "block"; // Mostrar spinner
+        spinner.style.display = "block";
 
         try {
           const response = await fetch(`${backendUrl}/send-message-all`, {
@@ -1395,7 +1660,6 @@
           if (response.ok) {
             const result = await response.text();
             feedback.innerHTML = `<div class="message success">${result}</div>`;
-            // Limpar campos após envio
             document.getElementById("allUsersSubject").value = "";
             document.getElementById("allUsersMessage").value = "";
             document.getElementById("allUsersShowOnLogin").checked = false;
@@ -1408,7 +1672,7 @@
           feedback.innerHTML =
             '<div class="message error">Erro ao enviar mensagem para todos.</div>';
         } finally {
-          spinner.style.display = "none"; // Esconder spinner
+          spinner.style.display = "none";
         }
       }
 
@@ -1443,12 +1707,11 @@
   </tr>`;
       }
 
-      // Função para visualizar notificações por CPF
       async function viewNotificationsByCpf() {
         const cpf = document.getElementById("viewCpf").value.trim();
         const notificationsList = document.getElementById("notificationsList");
         const spinner = document.getElementById("viewCpfSpinner");
-        notificationsList.innerHTML = ""; // Limpar conteúdo anterior
+        notificationsList.innerHTML = "";
 
         if (cpf === "") {
           notificationsList.innerHTML =
@@ -1456,10 +1719,9 @@
           return;
         }
 
-        spinner.style.display = "block"; // Mostrar spinner
+        spinner.style.display = "block";
 
         try {
-          // Atualização: Usando query parameter para CPF
           const response = await fetch(
             `${backendUrl}/notifications?cpf=${encodeURIComponent(cpf)}`,
             {
@@ -1479,12 +1741,12 @@
 
             let html = "<table>";
             html += `<tr>
-            <th>Data</th>
-            <th>Assunto</th>
-            <th>Mensagem</th>
-            <th>Mostrar no Login</th>
-            <th>Ações</th>
-            </tr>`;
+        <th>Data</th>
+        <th>Assunto</th>
+        <th>Mensagem</th>
+        <th>Mostrar no Login</th>
+        <th>Ações</th>
+        </tr>`;
 
             notifications.forEach((notification) => {
               html += generateNotificationRow(notification);
@@ -1501,11 +1763,10 @@
           notificationsList.innerHTML =
             '<div class="message error">Erro ao buscar notificações.</div>';
         } finally {
-          spinner.style.display = "none"; // Esconder spinner
+          spinner.style.display = "none";
         }
       }
 
-      // Função para editar uma notificação
       function editNotification(id) {
         const subjectElement = document.getElementById(`subject-${id}`);
         const messageElement = document.getElementById(`message-${id}`);
@@ -1513,28 +1774,25 @@
         const currentSubject = subjectElement.textContent;
         const currentMessage = messageElement.textContent;
 
-        // Substituir o texto por campos de entrada
         subjectElement.innerHTML = `<input type="text" id="edit-subject-${id}" value="${currentSubject}" />`;
         messageElement.innerHTML = `<textarea id="edit-message-${id}">${currentMessage}</textarea>`;
 
-        // Alterar os botões de ação
         const actionsCell = document.querySelector(
           `#notification-${id} .actions`
         );
         actionsCell.innerHTML = `
-        <button class="action-btn save-btn" onclick="saveEditNotification('${id}')">
-          <i class="fas fa-save" aria-hidden="true"></i>
-        </button>
-        <button class="action-btn cancel-btn" onclick="cancelEditNotification('${id}', '${currentSubject.replace(
+    <button class="action-btn save-btn" onclick="saveEditNotification('${id}')">
+      <i class="fas fa-save" aria-hidden="true"></i>
+    </button>
+    <button class="action-btn cancel-btn" onclick="cancelEditNotification('${id}', '${currentSubject.replace(
           /'/g,
           "\\'"
         )}', '${currentMessage.replace(/'/g, "\\'")}')">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
-      `;
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  `;
       }
 
-      // Função para salvar a edição da notificação
       async function saveEditNotification(id) {
         const newSubject = document
           .getElementById(`edit-subject-${id}`)
@@ -1560,24 +1818,22 @@
 
           if (response.ok) {
             const updatedNotification = await response.json();
-            // Atualizar a tabela com os novos valores
             document.getElementById(`subject-${id}`).textContent =
               updatedNotification.subject;
             document.getElementById(`message-${id}`).textContent =
               updatedNotification.message;
 
-            // Restaurar os botões de ação
             const actionsCell = document.querySelector(
               `#notification-${id} .actions`
             );
             actionsCell.innerHTML = `
-            <button class="action-btn edit-btn" onclick="editNotification('${id}')">
-              <i class="fas fa-edit" aria-hidden="true"></i>
-            </button>
-            <button class="action-btn delete-btn" onclick="deleteNotification('${id}')">
-              <i class="fas fa-trash" aria-hidden="true"></i>
-            </button>
-          `;
+        <button class="action-btn edit-btn" onclick="editNotification('${id}')">
+          <i class="fas fa-edit" aria-hidden="true"></i>
+        </button>
+        <button class="action-btn delete-btn" onclick="deleteNotification('${id}')">
+          <i class="fas fa-trash" aria-hidden="true"></i>
+        </button>
+      `;
 
             alert("Notificação atualizada com sucesso");
           } else {
@@ -1590,27 +1846,23 @@
         }
       }
 
-      // Função para cancelar a edição da notificação
       function cancelEditNotification(id, originalSubject, originalMessage) {
-        // Restaurar os valores originais
         document.getElementById(`subject-${id}`).textContent = originalSubject;
         document.getElementById(`message-${id}`).textContent = originalMessage;
 
-        // Restaurar os botões de ação
         const actionsCell = document.querySelector(
           `#notification-${id} .actions`
         );
         actionsCell.innerHTML = `
-        <button class="action-btn edit-btn" onclick="editNotification('${id}')">
-          <i class="fas fa-edit" aria-hidden="true"></i>
-        </button>
-        <button class="action-btn delete-btn" onclick="deleteNotification('${id}')">
-          <i class="fas fa-trash" aria-hidden="true"></i>
-        </button>
-      `;
+    <button class="action-btn edit-btn" onclick="editNotification('${id}')">
+      <i class="fas fa-edit" aria-hidden="true"></i>
+    </button>
+    <button class="action-btn delete-btn" onclick="deleteNotification('${id}')">
+      <i class="fas fa-trash" aria-hidden="true"></i>
+    </button>
+  `;
       }
 
-      // Função para deletar uma notificação
       async function deleteNotification(id) {
         if (!confirm("Tem certeza de que deseja deletar esta notificação?")) {
           return;
@@ -1625,7 +1877,6 @@
           });
 
           if (response.ok) {
-            // Remover a linha da tabela
             const row = document.getElementById(`notification-${id}`);
             if (row) {
               row.remove();
@@ -1641,120 +1892,147 @@
         }
       }
 
-      // Função para exibir indicações
-      async function showReferrals() {
-        const referralsList = document.getElementById("referralsList");
-        const spinner = document.getElementById("showReferralsSpinner");
-        referralsList.innerHTML = ""; // Limpar conteúdo anterior
+      // Event Listeners para o Excel
+      document
+        .getElementById("excelFile")
+        ?.addEventListener("change", function (e) {
+          if (e.target.files.length) {
+            processExcelFile(e.target.files[0]);
+          }
+        });
 
-        spinner.style.display = "block"; // Mostrar spinner
-
-        try {
-          const response = await fetch(`${backendUrl}/referrals`, {
-            headers: {
-              ...getAuthHeaders(),
-            },
-          });
-          if (response.ok) {
-            const referrals = await response.json();
-
-            if (!Array.isArray(referrals) || referrals.length === 0) {
-              referralsList.innerHTML = "<p>Nenhuma indicação encontrada.</p>";
-              return;
-            }
-
-            let html = "<table>";
-            html +=
-              "<tr><th>Data</th><th>Quem Indicou</th><th>Amigo Indicado</th><th>Empreendimento</th><th>E-mail</th><th>Telefone</th><th>Observações</th><th>Ações</th></tr>";
-
-            referrals.forEach((referral) => {
-              const date = referral.dateReferred
-                ? new Date(referral.dateReferred).toLocaleDateString("pt-BR")
-                : "";
-              html += `<tr id="referral-${referral._id}">
-                      <td>${date}</td>
-                      <td>${referral.referrerName || ""}</td>
-                      <td>${referral.friendName || ""}</td>
-                      <td>${referral.empreendimento || ""}</td>
-                      <td>${referral.email || ""}</td>
-                      <td>${referral.telefone || ""}</td>
-                      <td>${referral.observacoes || ""}</td>
-                      <td class="actions">
-                        <button class="action-btn delete-btn" onclick="deleteReferral('${
-                          referral._id
-                        }')">
-                          <i class="fas fa-trash" aria-hidden="true"></i>
-                        </button>
-                      </td>
-                    </tr>`;
+      document
+        .getElementById("selectAllBtn")
+        ?.addEventListener("click", function () {
+          document.getElementById("selectAll").checked = true;
+          document
+            .querySelectorAll(".row-checkbox:not([disabled])")
+            .forEach((cb) => {
+              cb.checked = true;
+              processedData[cb.dataset.index].selected = true;
             });
-            html += "</table>";
+        });
 
-            referralsList.innerHTML = html;
-          } else {
-            const errorText = await response.text();
-            referralsList.innerHTML = `<div class="message error">Erro: ${errorText}</div>`;
+      document
+        .getElementById("deselectAllBtn")
+        ?.addEventListener("click", function () {
+          document.getElementById("selectAll").checked = false;
+          document
+            .querySelectorAll(".row-checkbox:not([disabled])")
+            .forEach((cb) => {
+              cb.checked = false;
+              processedData[cb.dataset.index].selected = false;
+            });
+        });
+
+      document
+        .getElementById("bulkUploadForm")
+        ?.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const feedback = document.getElementById("bulkUploadFeedback");
+          const spinner = document.getElementById("bulkUploadSpinner");
+          const selectedData = processedData.filter(
+            (row) => row.selected && row.errors.length === 0
+          );
+
+          if (selectedData.length === 0) {
+            feedback.innerHTML =
+              '<div class="message error">Nenhum registro válido selecionado para envio.</div>';
+            return;
           }
-        } catch (error) {
-          console.error("Erro ao buscar indicações:", error);
-          referralsList.innerHTML =
-            '<div class="message error">Erro ao buscar indicações.</div>';
-        } finally {
-          spinner.style.display = "none"; // Esconder spinner
-        }
-      }
 
-      // Função para deletar uma indicação
-      async function deleteReferral(id) {
-        if (!confirm("Tem certeza de que deseja deletar esta indicação?")) {
-          return;
-        }
+          spinner.style.display = "block";
+          feedback.innerHTML =
+            '<div class="message">Enviando mensagens...</div>';
 
-        try {
-          const response = await fetch(`${backendUrl}/referrals/${id}`, {
-            method: "DELETE",
-            headers: {
-              ...getAuthHeaders(),
-            },
-          });
+          try {
+            const results = { success: [], failed: [] };
 
-          if (response.ok) {
-            // Remover a linha da tabela
-            const row = document.getElementById(`referral-${id}`);
-            if (row) {
-              row.remove();
+            for (let i = 0; i < selectedData.length; i += 5) {
+              const batch = selectedData.slice(i, i + 5);
+
+              const promises = batch.map((data) =>
+                fetch(`${backendUrl}/send-message`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    ...getAuthHeaders(),
+                  },
+                  body: JSON.stringify({
+                    cpf: data.cpf,
+                    subject: data.subject,
+                    message: data.message,
+                    showOnHome: data.showOnHome,
+                  }),
+                })
+                  .then(async (response) => {
+                    if (response.ok) {
+                      results.success.push(data.cpf);
+                    } else {
+                      const error = await response.text();
+                      results.failed.push({ cpf: data.cpf, error });
+                    }
+                  })
+                  .catch((error) => {
+                    results.failed.push({
+                      cpf: data.cpf,
+                      error: error.message,
+                    });
+                  })
+              );
+
+              await Promise.all(promises);
             }
-            alert("Indicação deletada com sucesso");
-          } else {
-            const errorText = await response.text();
-            alert(`Erro ao deletar indicação: ${errorText}`);
+
+            displayResults(results);
+            feedback.innerHTML =
+              '<div class="message success">Processamento concluído!</div>';
+          } catch (error) {
+            console.error("Erro no envio:", error);
+            feedback.innerHTML =
+              '<div class="message error">Erro ao enviar mensagens.</div>';
+          } finally {
+            spinner.style.display = "none";
           }
-        } catch (error) {
-          console.error("Erro ao deletar indicação:", error);
-          alert("Erro ao deletar indicação.");
-        }
-      }
+        });
 
-      // Função para baixar relatório em PDF
-      function downloadPDF() {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          alert("Você precisa estar logado para baixar o relatório.");
-          return;
+      function displayResults(results) {
+        const resultsDiv = document.getElementById("uploadResults");
+
+        let html = `
+    <h3>Resumo do Processamento</h3>
+    <p>Mensagens enviadas com sucesso: ${results.success.length}</p>
+    <p>Falhas no envio: ${results.failed.length}</p>
+  `;
+
+        if (results.failed.length > 0) {
+          html += `
+      <h4>Detalhes das Falhas:</h4>
+      <table>
+        <tr>
+          <th>CPF</th>
+          <th>Erro</th>
+        </tr>
+        ${results.failed
+          .map(
+            (fail) => `
+          <tr>
+            <td>${fail.cpf}</td>
+            <td>${fail.error}</td>
+          </tr>
+        `
+          )
+          .join("")}
+      </table>
+    `;
         }
 
-        const link = document.createElement("a");
-        link.href = `${backendUrl}/referrals/report`;
-        link.target = "_blank";
-        link.download = "relatorio_indicacoes.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        resultsDiv.innerHTML = html;
       }
 
       // Acessibilidade: Navegação via teclado
       document.addEventListener("keydown", function (event) {
-        // Fechar a sidebar colapsada com a tecla Esc
         if (event.key === "Escape" && sidebar.classList.contains("collapsed")) {
           toggleSidebar();
         }
