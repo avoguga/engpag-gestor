@@ -16,6 +16,50 @@
       rel="stylesheet"
     />
     <style>
+
+      /* Container principal */
+#notificationsList {
+  overflow-x: auto;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tabela */
+#notificationsList table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Cabeçalhos */
+#notificationsList th {
+  background-color: #f8f9fa;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Células */
+#notificationsList td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+}
+
+/* Colunas específicas */
+.date-column { width: 120px; }
+.subject-column { width: 25%; }
+.message-column { width: 40%; }
+.status-column { width: 120px; }
+.actions-column { width: 100px; }
+
+/* Quebra de linha para conteúdo longo */
+.message-column {
+  word-break: break-word;
+  max-width: 400px;
+}
       /* Reset básico para consistência */
       * {
         margin: 0;
@@ -453,7 +497,7 @@
         border-radius: 12px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 800px; /* Reduzido de 1000px para 800px */
+        max-width: 1100px; /* Reduzido de 1000px para 800px */
         margin: 20px auto 0; /* Centralizado horizontalmente e espaçamento acima */
         transition: all 0.3s ease;
       }
@@ -1115,12 +1159,12 @@
               <h3>Instruções:</h3>
               <p>A planilha deve conter as seguintes colunas:</p>
               <ul>
-                <li>cpf - CPF do usuário</li>
-                <li>assunto - Assunto da mensagem</li>
-                <li>mensagem - Conteúdo da mensagem</li>
+                <li>CPF: CPF do usuário</li>
+                <li>Assunto: Assunto da mensagem</li>
+                <li>Mensagem: Conteúdo da mensagem</li>
                 <li>
-                  mostrarNoLogin - "sim" ou "não" (se a mensagem deve aparecer
-                  no login)
+                  Mostrarnologin: Coloque "sim" ou "não" para informar se a mensagem deve aparecer
+                  no login, "Mostrarnologin" precisa ser junto.
                 </li>
               </ul>
             </div>
@@ -1472,10 +1516,10 @@
             processedData = jsonData.map((row) => {
               // Mapear campos do português para inglês
               const processed = {
-                cpf: String(row.cpf || "").replace(/\D/g, ""),
-                subject: row.assunto || "", // campo em português
-                message: row.mensagem || "", // campo em português
-                showOnHome: row.mostrarNoLogin?.toLowerCase() === "sim", // campo em português
+                cpf: String(row.CPF || "").replace(/\D/g, ""),
+                subject: row.Assunto || "", // campo em português
+                message: row.Mensagem || "", // campo em português
+                showOnHome: row.Mostrarnologin?.toLowerCase() === "sim", // campo em português
                 selected: true,
                 errors: [],
               };
@@ -1676,97 +1720,109 @@
         }
       }
 
-      function generateNotificationRow(notification) {
-        const date = notification.dateSent
-          ? new Date(notification.dateSent).toLocaleDateString("pt-BR")
-          : "";
+      function generateNotificationsTable(notifications) {
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th class="date-column">Data</th>
+          <th class="subject-column">Assunto</th>
+          <th class="message-column">Mensagem</th>
+          <th class="status-column">Mostrar no Login</th>
+          <th class="actions-column">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
-        return `<tr id="notification-${notification._id}">
-    <td>${date}</td>
-    <td id="subject-${notification._id}">${notification.subject || ""}</td>
-    <td id="message-${notification._id}">${notification.message || ""}</td>
-    <td>
-      <span class="show-on-login-status ${
-        notification.showOnHome ? "active" : ""
-      }">
-        ${notification.showOnHome ? "Sim" : "Não"}
-      </span>
-    </td>
-    <td class="actions">
-      <button class="action-btn edit-btn" onclick="editNotification('${
-        notification._id
-      }')">
-        <i class="fas fa-edit" aria-hidden="true"></i>
-      </button>
-      <button class="action-btn delete-btn" onclick="deleteNotification('${
-        notification._id
-      }')">
-        <i class="fas fa-trash" aria-hidden="true"></i>
-      </button>
-    </td>
-  </tr>`;
-      }
+  notifications.forEach(notification => {
+    const date = notification.dateSent ? 
+      new Date(notification.dateSent).toLocaleDateString("pt-BR") : "";
 
-      async function viewNotificationsByCpf() {
-        const cpf = document.getElementById("viewCpf").value.trim();
-        const notificationsList = document.getElementById("notificationsList");
-        const spinner = document.getElementById("viewCpfSpinner");
-        notificationsList.innerHTML = "";
+    html += `
+      <tr id="notification-${notification._id}">
+        <td class="date-column">${date}</td>
+        <td class="subject-column" id="subject-${notification._id}">${notification.subject || ""}</td>
+        <td class="message-column" id="message-${notification._id}">${notification.message || ""}</td>
+        <td class="status-column">
+          <span class="show-on-login-status ${notification.showOnHome ? "active" : ""}">
+            ${notification.showOnHome ? "Sim" : "Não"}
+          </span>
+        </td>
+        <td class="actions-column">
+          <button class="action-btn edit-btn" onclick="editNotification('${notification._id}')">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="action-btn delete-btn" onclick="deleteNotification('${notification._id}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  });
 
-        if (cpf === "") {
-          notificationsList.innerHTML =
-            '<div class="message error">Por favor, preencha o CPF.</div>';
-          return;
-        }
+  html += `
+      </tbody>
+    </table>
+  `;
 
-        spinner.style.display = "block";
+  return html;
+}
+async function viewNotificationsByCpf() {
+  const cpf = document.getElementById("viewCpf").value.trim();
+  const notificationsList = document.getElementById("notificationsList");
+  const spinner = document.getElementById("viewCpfSpinner");
+  
+  try {
+    if (!cpf) {
+      notificationsList.innerHTML = '<div class="message error">Por favor, preencha o CPF.</div>';
+      return;
+    }
 
-        try {
-          const response = await fetch(
-            `${backendUrl}/notifications?cpf=${encodeURIComponent(cpf)}`,
-            {
-              headers: {
-                ...getAuthHeaders(),
-              },
-            }
-          );
-          if (response.ok) {
-            const notifications = await response.json();
+    spinner.style.display = "block";
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      notificationsList.innerHTML = '<div class="message error">Sessão expirada. Por favor, faça login novamente.</div>';
+      return;
+    }
 
-            if (!Array.isArray(notifications) || notifications.length === 0) {
-              notificationsList.innerHTML =
-                "<p>Nenhuma notificação encontrada para este CPF.</p>";
-              return;
-            }
-
-            let html = "<table>";
-            html += `<tr>
-        <th>Data</th>
-        <th>Assunto</th>
-        <th>Mensagem</th>
-        <th>Mostrar no Login</th>
-        <th>Ações</th>
-        </tr>`;
-
-            notifications.forEach((notification) => {
-              html += generateNotificationRow(notification);
-            });
-            html += "</table>";
-
-            notificationsList.innerHTML = html;
-          } else {
-            const errorText = await response.text();
-            notificationsList.innerHTML = `<div class="message error">Erro: ${errorText}</div>`;
-          }
-        } catch (error) {
-          console.error("Erro ao buscar notificações:", error);
-          notificationsList.innerHTML =
-            '<div class="message error">Erro ao buscar notificações.</div>';
-        } finally {
-          spinner.style.display = "none";
+    const response = await fetch(
+      `${backendUrl}/notifications?cpf=${encodeURIComponent(cpf)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       }
+    );
 
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        window.location.reload();
+        return;
+      }
+      const errorText = await response.text();
+      throw new Error(errorText || `HTTP error! status: ${response.status}`);
+    }
+
+    const notifications = await response.json();
+
+    if (!notifications || notifications.length === 0) {
+      notificationsList.innerHTML = '<div class="message info">Nenhuma notificação encontrada para este CPF.</div>';
+      return;
+    }
+
+    notificationsList.innerHTML = generateNotificationsTable(notifications);
+
+  } catch (error) {
+    console.error("Erro ao buscar notificações:", error);
+    notificationsList.innerHTML = `<div class="message error">Erro ao buscar notificações: ${error.message}</div>`;
+  } finally {
+    spinner.style.display = "none";
+  }
+}
       function editNotification(id) {
         const subjectElement = document.getElementById(`subject-${id}`);
         const messageElement = document.getElementById(`message-${id}`);
