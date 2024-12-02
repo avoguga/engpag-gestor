@@ -2057,14 +2057,14 @@ async function viewNotificationsByCpf() {
         const resultsDiv = document.getElementById("uploadResults");
 
         let html = `
-    <h3>Resumo do Processamento</h3>
+    <h3>Resumo do processamento</h3>
     <p>Mensagens enviadas com sucesso: ${results.success.length}</p>
     <p>Falhas no envio: ${results.failed.length}</p>
   `;
 
         if (results.failed.length > 0) {
           html += `
-      <h4>Detalhes das Falhas:</h4>
+      <h4>Detalhes das falhas:</h4>
       <table>
         <tr>
           <th>CPF</th>
